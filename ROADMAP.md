@@ -239,20 +239,27 @@ carries an optional `Email`, preferred over the singleton
 
 ---
 
-## Stage 8 — Cross-cutting behavior
+## Stage 8 — Cross-cutting behavior ✅ DONE
 
 Things that touch the whole app rather than one screen — do these once the
 screens that need them exist, not necessarily all at once at the end.
 
-- [ ] Session timeout: 10-minute inactivity → warning modal → 60s grace →
-      auto-logout (mirrors `App.js`'s timer logic)
-- [ ] Global error/loading conventions — confirm every screen uses
-      `AppLoadingOverlay` and a consistent error-display pattern
-- [ ] Role gating audit — re-check every admin-only screen/action against
-      what `TopNavBar.js` / route-level checks actually gate today
-- [ ] Offline/poor-connectivity behavior on submit actions (the React app
-      has none today — decide whether Flutter should do better, e.g. retry
-      or queue, or intentionally match parity first)
+- [x] Session timeout: 10-minute inactivity → warning modal → 60s grace →
+      auto-logout (mirrors `App.js`'s timer logic) — `SessionTimeoutWrapper`,
+      wrapping `AppShell` in `main.dart`'s `AuthGate`
+- [x] Global error/loading conventions — audited (see Decisions log): error
+      display is already 100% consistent (`colorScheme.error` + `MyText`,
+      16 files); initial-page loading is already 100% consistent too, via
+      a plain early-return pattern rather than literally reusing
+      `AppLoadingOverlay` — see that widget's updated doc comment for why
+- [x] Role gating audit — nav-level gating confirmed matching `TopNavBar.js`
+      exactly (Stock Reports + Users, nothing else). Added defense-in-depth:
+      `AccessDeniedView`, an internal Admin check inside `ReportListScreen`
+      and `UserManagementScreen` themselves, matching the belt-and-suspenders
+      pattern `ReportList.jsx`/`UserManagement.js` already use (their own
+      internal check, independent of the nav hiding the link)
+- [x] Offline/poor-connectivity decision: match parity, not build retry/queue
+      infrastructure — see Decisions log
 
 ---
 
@@ -334,3 +341,22 @@ screens that need them exist, not necessarily all at once at the end.
   (`onChangePasswordSuccess`) that `App.js` never passes, and "Confirm
   Password" is captured but never compared against "New Password" anywhere,
   client or server. Both are just built correctly in the Flutter screen.
+- **`AppLoadingOverlay` doc corrected, not the screens (Stage 8):** the
+  widget's own doc comment claimed it should be used for a page's initial
+  data load, but every screen actually uses a plain early-return instead
+  (`if (isLoading) return const Center(child: CircularProgressIndicator())`)
+  — and rightly so: `child` is a normal constructor argument, built eagerly
+  by Dart even while `isLoading` is about to hide it, so a child that
+  dereferences not-yet-loaded data would throw before the spinner ever
+  swaps in. Fixed the doc comment to describe reality (and warn about the
+  eager-construction trap) instead of refactoring 9 screens to force-fit a
+  widget that's a genuine mismatch for this case — `AppLoadingOverlay`
+  remains correctly used for in-place action overlays (e.g. the login
+  button), which is what it's actually for.
+- **Offline/poor-connectivity: match parity, not build retry/queue (Stage
+  8):** the React app has no special handling for a dropped connection —
+  a failed request just surfaces its error message, same as this app's
+  consistent `colorScheme.error` pattern already does. Building retry or
+  offline-queue infrastructure would be a substantial feature disproportionate
+  to a cross-cutting polish stage; revisit only if it comes up as an actual
+  problem for field use, not preemptively.

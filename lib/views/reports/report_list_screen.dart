@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:promosells_flutter/controllers/auth_controller.dart';
 import 'package:promosells_flutter/controllers/report_list_controller.dart';
 import 'package:promosells_flutter/models/transaction_report_row.dart';
 import 'package:promosells_flutter/views/reports/report_detail_screen.dart';
+import 'package:promosells_flutter/widgets/access_denied_view.dart';
 import 'package:promosells_flutter/widgets/my_spacing.dart';
 import 'package:promosells_flutter/widgets/my_text.dart';
 
@@ -13,6 +15,10 @@ class ReportListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.find<AuthController>().isAdmin) {
+      return const AccessDeniedView(message: 'You do not have permission to access this page. Admin access required.');
+    }
+
     if (!Get.isRegistered<ReportListController>()) {
       Get.put(ReportListController());
     }

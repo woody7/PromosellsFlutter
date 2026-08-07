@@ -13,10 +13,23 @@ import 'package:flutter/material.dart';
 ///
 /// Two modes:
 ///   - [replaceContent] (default true): while loading, the spinner is the
-///     ONLY thing shown — use for a page's initial data load.
+///     ONLY thing shown.
 ///   - [replaceContent] = false: the spinner overlays on top of existing
 ///     content (with a light scrim) — use for an in-progress action on a
-///     page that already has real content on it (e.g. submitting a form).
+///     page that already has real content on it (e.g. submitting a form,
+///     as in login_screen.dart's submit button).
+///
+/// Caution with [replaceContent] = true for a page's *initial* data load:
+/// [child] is a plain constructor argument, so Dart builds it eagerly even
+/// while `isLoading` is true and about to hide it — passing a widget that
+/// dereferences not-yet-loaded data (e.g. `SomeWidget(data!)`) will throw
+/// before this widget gets a chance to swap in the spinner. Every screen in
+/// this app instead uses a plain early-return
+/// (`if (isLoading) return const Center(child: CircularProgressIndicator())`)
+/// for that case, which sidesteps the issue entirely — the loaded-content
+/// branch is never even reached, let alone constructed, while loading.
+/// Reach for that pattern instead unless the child is safe to construct
+/// regardless of load state.
 class AppLoadingOverlay extends StatelessWidget {
   const AppLoadingOverlay({
     super.key,

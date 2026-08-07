@@ -6,6 +6,7 @@ import 'package:promosells_flutter/theme/app_theme.dart';
 import 'package:promosells_flutter/theme/theme_controller.dart';
 import 'package:promosells_flutter/views/auth/login_screen.dart';
 import 'package:promosells_flutter/views/shell/app_shell.dart';
+import 'package:promosells_flutter/widgets/session_timeout_wrapper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,6 @@ class AuthGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = Get.find<AuthController>();
-    return Obx(() => auth.isLoggedIn ? const AppShell() : const LoginScreen());
+    return Obx(() => auth.isLoggedIn ? const SessionTimeoutWrapper(child: AppShell()) : const LoginScreen());
   }
 }

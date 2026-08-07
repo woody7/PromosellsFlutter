@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:promosells_flutter/controllers/auth_controller.dart';
 import 'package:promosells_flutter/controllers/user_management_controller.dart';
+import 'package:promosells_flutter/widgets/access_denied_view.dart';
 import 'package:promosells_flutter/widgets/my_card.dart';
 import 'package:promosells_flutter/widgets/my_spacing.dart';
 import 'package:promosells_flutter/widgets/my_text.dart';
@@ -16,6 +18,10 @@ class UserManagementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.find<AuthController>().isAdmin) {
+      return const AccessDeniedView(message: 'Admin privileges required.');
+    }
+
     if (!Get.isRegistered<UserManagementController>()) {
       Get.put(UserManagementController());
     }
