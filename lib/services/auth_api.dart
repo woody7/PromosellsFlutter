@@ -36,4 +36,36 @@ class AuthApi {
     final roles = (data['roles'] as List?)?.map((r) => r.toString()).toList() ?? <String>[];
     return Session(email: data['email'] as String, roles: roles);
   }
+
+  /// `POST api/UserAccount/ChangePassword`. The backend always answers with
+  /// HTTP 200 whether the change succeeded or not — the outcome is only in
+  /// the response text ("Password Changed Successfully" vs "Password Change
+  /// Failed. Current password is incorrect"), so that's what's checked here.
+  static Future<bool> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    final response = await http.post(
+      ApiConfig.resolve('api/UserAccount/ChangePassword'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'CurrentPassword': currentPassword,
+        'NewPassword': newPassword,
+        'ConfirmPassword': confirmPassword,
+        'Email': email,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw AuthApiException('Could not reach the server. Please try again.');
+    }
+
+    final message = jsonDecode(response.body) as String;
+    if (!message.toLowerCase().contains('successfully')) {
+      throw AuthApiException(message);
+    }
+    return true;
+  }
 }

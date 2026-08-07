@@ -179,25 +179,39 @@ user/date range, copy-as-text, export PDF/CSV. ✅
 
 ---
 
-## Stage 6 — Admin screens: Overview dashboard, User Management, Change Password
+## Stage 6 — Admin screens: Overview dashboard, User Management, Change Password ✅ DONE
 
 Ports `Overview.jsx` + `UserManagement.js` + `Changepassword.jsx`.
 
-- [ ] **Decision needed:** chart package for Overview's pie/bar charts —
-      AdroitERP's pubspec doesn't include one. Recommend `fl_chart` (most
-      common Flutter choice); confirm before adding.
-- [ ] Overview dashboard — 8 `GET api/AdminDashboard/*` endpoints (stock card,
+- [x] Chart package: `fl_chart` (confirmed with you before adding)
+- [x] Overview dashboard — 8 `GET api/AdminDashboard/*` endpoints (stock card,
       customer card, sales card, samples pie chart, top customers bar chart,
       top years bar chart, samples due for pickup table, upcoming
       sale/return reconciliation table)
-- [ ] User Management — `GET api/UserAccount/ListUsers` (read-only, same as React today)
-- [ ] Change Password — `POST api/UserAccount/ChangePassword`
-      (**note:** the React version hardcodes `https://localhost:7151/...`
-      instead of using its configured base URL — that's a bug in the React
-      app; use `ApiConfig.baseUrl` here instead, don't replicate the bug)
+- [x] User Management — `GET api/UserAccount/ListUsers` (read-only, same as React today)
+- [x] Change Password — `POST api/UserAccount/ChangePassword`, using
+      `ApiConfig.baseUrl` instead of the React version's hardcoded
+      `https://localhost:7151/...`
 
 **Definition of done:** admin-only dashboard with real charts/cards,
-read-only user list, working change-password form.
+read-only user list, working change-password form. ✅
+
+**Bonus finding while building this stage:** Change Password had the same
+`_CurrentUser` singleton bug as the drop-off/pickup/sale/incident endpoints
+fixed earlier — `ChangePasswordViewModel` carried no email, so the backend
+resolved *whose* password to change entirely from the shared singleton. With
+two people active around the same time, a password-change request could
+validate against the wrong account. Fixed the same way: added an optional
+`Email` to the DTO, preferred over the singleton when present
+(SampleTrackerAPIs commit `87737cc`).
+
+Two more gaps found and fixed only on the Flutter side (no backend changes,
+since they're pure client-side implementation gaps in React, see Decisions
+log): the React Change Password screen's success handler calls a prop
+(`onChangePasswordSuccess`) that App.js never actually passes, so it throws
+in the console instead of confirming anything; and "Confirm Password" is
+captured but never compared against "New Password" anywhere, client or
+server.
 
 ---
 
@@ -254,8 +268,6 @@ screens that need them exist, not necessarily all at once at the end.
 
 ## Open decisions / things to confirm with you before building
 
-- [ ] Chart package for Stage 6 (`fl_chart` recommended)
-- [ ] Share package for Stage 4 (`share_plus` recommended)
 - [ ] Whether Stage 9's release prep is in scope now or a later, separate effort
 
 ## Decisions log
@@ -298,3 +310,16 @@ screens that need them exist, not necessarily all at once at the end.
   (`Printing.sharePdf`), same call underneath. Kept as two buttons anyway
   to match the React layout and because the labels still signal different
   intent to the user, even though the mechanism is identical here.
+- **User Management roles column (Stage 6):** left blank, matching the
+  React version — the backend's `ListUsers` endpoint only ever returns
+  `{ id, userName, email }`, no roles, so `user.roles?.join(', ')` in
+  `UserManagement.js` always renders nothing. Not fixed, since it would mean
+  a backend change (adding a per-user roles lookup) beyond this stage's scope;
+  flagged here as a nice-to-have if it comes up later.
+- **Change Password fixes are Flutter-only, not backend (Stage 6):** unlike
+  the singleton bug (fixed in the backend, see above), two other gaps in
+  `Changepassword.jsx` are pure client-side implementation gaps with no
+  server-side counterpart to fix — its success handler calls a prop
+  (`onChangePasswordSuccess`) that `App.js` never passes, and "Confirm
+  Password" is captured but never compared against "New Password" anywhere,
+  client or server. Both are just built correctly in the Flutter screen.

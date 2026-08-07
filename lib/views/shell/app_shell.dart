@@ -7,8 +7,9 @@ import 'package:promosells_flutter/views/customers/customer_list_screen.dart';
 import 'package:promosells_flutter/views/customers/customer_map_screen.dart';
 import 'package:promosells_flutter/views/reports/incident_report_screen.dart';
 import 'package:promosells_flutter/views/reports/report_list_screen.dart';
+import 'package:promosells_flutter/views/shell/change_password_screen.dart';
 import 'package:promosells_flutter/views/shell/overview_screen.dart';
-import 'package:promosells_flutter/views/shell/placeholder_screen.dart';
+import 'package:promosells_flutter/views/shell/user_management_screen.dart';
 import 'package:promosells_flutter/views/stocklist/stocklist_screen.dart';
 import 'package:promosells_flutter/widgets/my_text.dart';
 
@@ -47,15 +48,8 @@ class _AppShellState extends State<AppShell> {
         const _NavItem(label: 'Customer Map', icon: LucideIcons.map, page: CustomerMapScreen()),
         const _NavItem(label: 'Incident Report', icon: LucideIcons.clipboard_list, page: IncidentReportScreen()),
         const _NavItem(label: 'Stock Reports', icon: LucideIcons.chart_bar, page: ReportListScreen(), adminOnly: true),
-        _NavItem(
-            label: 'Users',
-            icon: LucideIcons.shield,
-            page: const PlaceholderScreen(title: 'User Management', icon: LucideIcons.shield),
-            adminOnly: true),
-        const _NavItem(
-            label: 'Change Password',
-            icon: LucideIcons.key_round,
-            page: PlaceholderScreen(title: 'Change Password', icon: LucideIcons.key_round)),
+        const _NavItem(label: 'Users', icon: LucideIcons.shield, page: UserManagementScreen(), adminOnly: true),
+        const _NavItem(label: 'Change Password', icon: LucideIcons.key_round, page: ChangePasswordScreen()),
       ];
 
   @override
