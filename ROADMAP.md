@@ -160,19 +160,22 @@ exportable as PDF/Excel, shareable — matching `Report.js`. ✅
 
 ---
 
-## Stage 5 — Incident Report by Date
+## Stage 5 — Incident Report by Date ✅ DONE
 
 Ports `IncidentReportByDate.js`.
 
-- [ ] `GET api/UserAccount/ListUsers` (filter dropdown)
-- [ ] `GET api/Incidents/GetCustomerIncidentsAll` (Admin)
-- [ ] `GET api/Incidents/GetUserCustomerIncidentsForUser` (User)
-- [ ] Date range filter
-- [ ] "Copy as Text" (`Clipboard` from `flutter/services.dart` — no new package needed)
-- [ ] PDF export (`pdf` + `printing`, reuse Stage 4's setup)
+- [x] `GET api/UserAccount/ListUsers` (filter dropdown)
+- [x] `GET api/Incidents/GetCustomerIncidentsAll` (Admin)
+- [x] `GET api/Incidents/GetUserCustomerIncidentsForUser` (User)
+- [x] Date range filter
+- [x] "Copy as Text" (`Clipboard` from `flutter/services.dart`)
+- [x] PDF export (`pdf` + `printing`, reuse Stage 4's setup)
+- [x] CSV export (`share_plus`, reuse Stage 4's setup) — wasn't listed in this
+      stage's original scope, but React's `handleExport` does it and the
+      packages were already in place, so it was cheap to include for full parity
 
 **Definition of done:** matches `IncidentReportByDate.js` — filter by
-user/date range, copy-as-text, export PDF.
+user/date range, copy-as-text, export PDF/CSV. ✅
 
 ---
 
