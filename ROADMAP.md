@@ -37,30 +37,41 @@ one before it is checked off, unless we explicitly agree to jump around.
 
 ---
 
-## Stage 1 — Stock List (new-customer drop-off)
+## Stage 1 — Stock List (new-customer drop-off) ✅ DONE
 
 Ports `Stocklist.js` + `Modal.js` + `Customerdetails.js` + `OfficeCaptureFields.js`.
 This is the first real screen because everything after it (drop-off modal on
 the customer-detail screen, customer edit) reuses the camera/geo capture
 widget built here.
 
-- [ ] Camera capture widget (`image_picker`) — office/customer photo
-- [ ] Geolocation capture widget (`geolocator`) — lat/long of customer office
-- [ ] Android permissions: camera, location (`AndroidManifest.xml`)
-- [ ] iOS permissions: `NSCameraUsageDescription`, `NSLocationWhenInUseUsageDescription`
+- [x] Camera capture widget (`image_picker`) — office/customer photo
+- [x] Geolocation capture widget (`geolocator`) — lat/long of customer office
+- [x] Android permissions: camera, location (`AndroidManifest.xml`)
+- [x] iOS permissions: `NSCameraUsageDescription`, `NSLocationWhenInUseUsageDescription`
       (`Info.plist`)
-- [ ] `GET api/stocklist/GetallStock` — stock list grouped by stockGroup
-- [ ] Stock quantity picker per item (port of `NumericCheckbox`)
-- [ ] New-customer detail form (company, tel, contact, address, ref no, drop-off type)
-- [ ] Phone number validation (port of `PhoneNumberValidation.js`)
-- [ ] Confirmation modal before submit
-- [ ] `POST api/StockTransactions/PostDropOff` (multipart: form fields + email + photo)
-- [ ] Navigate to report detail on success (Stage 4 dependency — stub the
-      destination screen until Stage 4 lands)
+- [x] `GET api/stocklist/GetallStock` — stock list grouped by stockGroup
+- [x] Stock quantity picker per item (port of `NumericCheckbox`)
+- [x] New-customer detail form (company, tel, contact, address, ref no, drop-off type)
+- [x] Phone number validation (port of `PhoneNumberValidation.js` — simplified to
+      immediate validation instead of the original's debounce, see Decisions log)
+- [x] Confirmation modal before submit
+- [x] `POST api/StockTransactions/PostDropOff` (multipart: form fields + email + photo)
+- [x] Navigate to report detail on success — `ReportStubScreen` placeholder
+      until Stage 4 builds the real report detail screen
 
 **Definition of done:** a field user can add a brand-new prospective
 customer, select stock quantities, capture a photo + location, and submit a
-drop-off — matching what `Stocklist.js` does today.
+drop-off — matching what `Stocklist.js` does today. ✅
+
+**Bonus finding while building this stage:** the live React app's drop-off
+submissions weren't actually saving stock items — `PostDropOff`/
+`PostDropOffExistingCustomer` unconditionally overwrite the bound
+`stockData` with `ParseStockData(data.StockDataJson)`
+(`StockTransactionsController.cs:64,263`), and the React app never sent
+`StockDataJson`, so every drop-off recorded only an incident note with zero
+stock movement. Fixed in `Stocklist.js`/`DropOffModal.js` (React repo,
+uncommitted pending your testing) and built correctly from the start here —
+Flutter sends `StockDataJson` as JSON-encoded `[[stockListId, quantity], ...]`.
 
 ---
 
@@ -224,3 +235,11 @@ screens that need them exist, not necessarily all at once at the end.
 - **Map provider (Stage 3):** OpenStreetMap via `flutter_map` + `latlong2`,
   matching react-leaflet in the React app — not Google Maps. No API key
   needed. Decided 2026-08-07.
+- **Phone validation (Stage 1):** validated immediately on change instead of
+  React's ~1s debounced check — the debounce didn't change the outcome, just
+  delayed it, so it was dropped rather than ported literally.
+- **Drop-off stock data bug (Stage 1):** discovered the live React app never
+  persisted selected stock items on drop-off (see Stage 1 notes above).
+  Flutter's `StocklistApi.submitDropOff` sends the format the backend
+  actually reads (`StockDataJson`); the matching React-side fix is written
+  but not yet committed — you're testing it first.

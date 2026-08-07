@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Promosells needs camera access to capture office photos during customer visits.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Promosells needs your location to record the customer office location during drop-offs.</string>
 </dict>
 </plist>
