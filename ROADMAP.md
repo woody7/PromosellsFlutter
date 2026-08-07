@@ -82,37 +82,42 @@ Flutter sends `StockDataJson` as JSON-encoded `[[stockListId, quantity], ...]`.
 
 ---
 
-## Stage 2 — Customer List + Customer Detail (existing-customer transactions)
+## Stage 2 — Customer List + Customer Detail (existing-customer transactions) ✅ DONE
 
 Ports `customerlist.js` + `customerstock.jsx` + `DropOffModal.js` +
 `PickupModal.js` + `SalesModal.js` + `AddIncidentModal.js`.
 
-- [ ] Customer list screen
-  - [ ] `GET api/ProspCustomers/GetAllCustomersOfUser?userEmail=` (User role)
-  - [ ] `GET api/ProspCustomers/GetAllCustomers` (Admin role)
-  - [ ] Tap-to-call (`url_launcher`, `tel:`)
-  - [ ] Navigate to customer detail
-- [ ] Customer detail screen
-  - [ ] `GET api/ProspCustomers/GetCustomerDetails?customerID=`
-  - [ ] `GET api/StockTransReports/StocksWithOneCustomer?CustomerID=`
-  - [ ] `GET api/ProspCustomers/GetCustomerIncidents?customerId=` (incident history table)
-  - [ ] Action buttons: Add Incident, Drop Off, Pick Up, Sales
-- [ ] Drop-off modal (existing customer)
-  - [ ] `GET api/stocklist/GetallStock`
-  - [ ] `POST api/StockTransactions/PostDropOffExistingCustomer?WebCustID=`
-  - [ ] Reuses Stage 1's camera/geo capture widget
-- [ ] Pickup modal
-  - [ ] `POST api/StockTransactions/PostPickUp`
-- [ ] Sales modal
-  - [ ] `POST api/StockTransactions/PostSale`
-- [ ] Add-incident modal
-  - [ ] `POST api/ProspCustomers/AddCustomerIncident`
-- [ ] All four write payloads include `email` (per the recent backend fix —
-      confirm the DTOs still carry `Email` when you build against latest SampleTrackerAPIs)
+- [x] Customer list screen
+  - [x] `GET api/ProspCustomers/GetAllCustomersOfUser?userEmail=` (User role)
+  - [x] `GET api/ProspCustomers/GetAllCustomers` (Admin role)
+  - [x] Tap-to-call (`url_launcher`, `tel:`)
+  - [x] Navigate to customer detail
+- [x] Customer detail screen
+  - [x] `GET api/ProspCustomers/GetCustomerDetails?customerID=`
+  - [x] `GET api/StockTransReports/StocksWithOneCustomer?CustomerID=`
+  - [x] `GET api/ProspCustomers/GetCustomerIncidents?customerID=` (incident history table)
+  - [x] Action buttons: Add Incident, Drop Off, Pick Up, Sales
+- [x] Drop-off modal (existing customer)
+  - [x] `GET api/stocklist/GetallStock`
+  - [x] `POST api/StockTransactions/PostDropOffExistingCustomer?WebCustID=`
+  - [x] Reuses Stage 1's camera/geo capture widget
+- [x] Pickup modal
+  - [x] `POST api/StockTransactions/PostPickUp`
+- [x] Sales modal
+  - [x] `POST api/StockTransactions/PostSale`
+- [x] Add-incident modal
+  - [x] `POST api/ProspCustomers/AddCustomerIncident`
+- [x] All four write payloads include `email`
 
 **Definition of done:** a field user can browse their customers, open one,
 see its stock/incident history, and run drop-off/pickup/sale/incident
-transactions against it.
+transactions against it. ✅
+
+**Improvement over the React version:** there, the drop-off/pickup/sales
+modals pass a no-op `onConfirm`, so the stock table on customerstock.jsx
+doesn't refresh after a transaction — only Add Incident does. Here, every
+transaction modal refreshes both the stock and incident lists on success
+(`CustomerDetailController.refreshAfterTransaction`).
 
 ---
 
@@ -250,3 +255,8 @@ screens that need them exist, not necessarily all at once at the end.
   Flutter's `StocklistApi.submitDropOff` sends the format the backend
   actually reads (`StockDataJson`); the matching React-side fix is written
   but not yet committed — you're testing it first.
+- **Auto-refresh after transactions (Stage 2):** `customerstock.jsx` passes a
+  no-op `onConfirm` to the drop-off/pickup/sales modals, so their React
+  screen doesn't refresh after a transaction. `CustomerDetailController`
+  refreshes stocks + incidents after every transaction modal instead — a
+  UX fix with no data-integrity implications, not a behavior worth copying.

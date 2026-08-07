@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:promosells_flutter/config/api_config.dart';
 import 'package:promosells_flutter/models/drop_off_result.dart';
 import 'package:promosells_flutter/models/stock_list_entry.dart';
+import 'package:promosells_flutter/services/api_response_utils.dart';
 
 class StocklistApiException implements Exception {
   final String message;
@@ -83,17 +84,6 @@ class StocklistApi {
       throw StocklistApiException('Failed to submit the drop-off. Please try again.');
     }
 
-    // The response body is either a bare JSON number (0, no stock items) or
-    // a JSON string (the generated document number) depending on what the
-    // backend returned — normalize both instead of assuming one shape.
-    final raw = response.body.trim();
-    dynamic parsed;
-    try {
-      parsed = jsonDecode(raw);
-    } catch (_) {
-      parsed = raw;
-    }
-    final text = parsed.toString();
-    return DropOffResult(documentNumber: text == '0' ? null : text);
+    return DropOffResult(documentNumber: parseDocumentNumber(response.body));
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:get/get.dart';
 
 import 'package:promosells_flutter/controllers/auth_controller.dart';
+import 'package:promosells_flutter/views/customers/customer_list_screen.dart';
 import 'package:promosells_flutter/views/shell/overview_screen.dart';
 import 'package:promosells_flutter/views/shell/placeholder_screen.dart';
 import 'package:promosells_flutter/views/stocklist/stocklist_screen.dart';
@@ -39,8 +40,7 @@ class _AppShellState extends State<AppShell> {
   List<_NavItem> get _items => [
         const _NavItem(label: 'Overview', icon: LucideIcons.layout_dashboard, page: OverviewScreen()),
         const _NavItem(label: 'Stock List', icon: LucideIcons.package, page: StocklistScreen()),
-        const _NavItem(
-            label: 'Customers', icon: LucideIcons.users, page: PlaceholderScreen(title: 'Customers', icon: LucideIcons.users)),
+        const _NavItem(label: 'Customers', icon: LucideIcons.users, page: CustomerListScreen()),
         const _NavItem(
             label: 'Customer Map', icon: LucideIcons.map, page: PlaceholderScreen(title: 'Customer Map', icon: LucideIcons.map)),
         const _NavItem(
