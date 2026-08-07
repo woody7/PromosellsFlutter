@@ -8,6 +8,13 @@ add sub-items if a stage turns out to need more than expected.
 Work proceeds stage by stage, in order. Don't start a later stage before the
 one before it is checked off, unless we explicitly agree to jump around.
 
+**Backend target:** all development/testing must point at the DEMO API
+(`https://demopromosellapis.adroitbureau.com/`), never the live production
+one (`swlaccrapromosellapis.adroitbureau.com`) — test entries must not land
+in the real database. This is `ApiConfig`'s default
+(`lib/config/api_config.dart`); production is opt-in only, via
+`--dart-define=API_BASE_URL=...` for an actual release build.
+
 ---
 
 ## Stage 0 — Foundation ✅ DONE
