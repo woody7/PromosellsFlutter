@@ -121,19 +121,21 @@ transaction modal refreshes both the stock and incident lists on success
 
 ---
 
-## Stage 3 — Customer Map
+## Stage 3 — Customer Map ✅ DONE
 
 Ports `CustomerMap.jsx`, which uses react-leaflet + OpenStreetMap tiles — no
 API key, no billing account. Flutter equivalent: `flutter_map` (OSM tile
 layer) + `latlong2`, already swapped into `pubspec.yaml` in place of
 `google_maps_flutter`.
 
-- [ ] `GET api/ProspCustomers/GetAllCustomersOfUser` / `GetAllCustomers` (role-gated, same as Stage 2)
-- [ ] Markers at each customer's lat/long
-- [ ] Marker tap → "View Details" → navigates to Stage 2's customer detail screen
+- [x] `GET api/ProspCustomers/GetAllCustomersOfUser` / `GetAllCustomers` (role-gated, same as Stage 2)
+- [x] Markers at each customer's lat/long
+- [x] Marker tap → "View Details" → navigates to Stage 2's customer detail screen
+      (via a bottom sheet showing name/company/address first, matching the
+      React version's marker-popup-then-button two-step, not instant navigation)
 
 **Definition of done:** map view matching `CustomerMap.jsx`, marker tap opens
-the same customer detail screen as the list view.
+the same customer detail screen as the list view. ✅
 
 ---
 
