@@ -8,6 +8,7 @@ import 'package:promosells_flutter/models/customer.dart';
 import 'package:promosells_flutter/models/stock_list_entry.dart';
 import 'package:promosells_flutter/services/customer_api.dart';
 import 'package:promosells_flutter/services/stocklist_api.dart';
+import 'package:promosells_flutter/views/reports/report_detail_screen.dart';
 import 'package:promosells_flutter/widgets/my_button.dart';
 import 'package:promosells_flutter/widgets/my_spacing.dart';
 import 'package:promosells_flutter/widgets/my_text.dart';
@@ -106,7 +107,7 @@ class _DropOffExistingCustomerDialogState extends State<_DropOffExistingCustomer
     try {
       final email = Get.find<AuthController>().session.value?.email ?? '';
       final stockData = _quantities.entries.where((e) => e.value > 0).map((e) => [e.key, e.value]).toList();
-      await CustomerApi.submitDropOffExistingCustomer(
+      final result = await CustomerApi.submitDropOffExistingCustomer(
         customerId: widget.customer.customerId,
         incidentDate: _incidentDate,
         incidentType: _incidentType,
@@ -119,7 +120,13 @@ class _DropOffExistingCustomerDialogState extends State<_DropOffExistingCustomer
         photo: _photo,
       );
       widget.onSubmitted();
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+        final documentNumber = result.documentNumber;
+        if (documentNumber != null) {
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => ReportDetailScreen(reportId: documentNumber)));
+        }
+      }
     } on CustomerApiException catch (e) {
       setState(() => _error = e.message);
     } finally {

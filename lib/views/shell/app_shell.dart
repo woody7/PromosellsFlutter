@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:promosells_flutter/controllers/auth_controller.dart';
 import 'package:promosells_flutter/views/customers/customer_list_screen.dart';
 import 'package:promosells_flutter/views/customers/customer_map_screen.dart';
+import 'package:promosells_flutter/views/reports/report_list_screen.dart';
 import 'package:promosells_flutter/views/shell/overview_screen.dart';
 import 'package:promosells_flutter/views/shell/placeholder_screen.dart';
 import 'package:promosells_flutter/views/stocklist/stocklist_screen.dart';
@@ -47,11 +48,7 @@ class _AppShellState extends State<AppShell> {
             label: 'Incident Report',
             icon: LucideIcons.clipboard_list,
             page: PlaceholderScreen(title: 'Incident Report by Date', icon: LucideIcons.clipboard_list)),
-        _NavItem(
-            label: 'Stock Reports',
-            icon: LucideIcons.chart_bar,
-            page: const PlaceholderScreen(title: 'Stock Reports', icon: LucideIcons.chart_bar),
-            adminOnly: true),
+        const _NavItem(label: 'Stock Reports', icon: LucideIcons.chart_bar, page: ReportListScreen(), adminOnly: true),
         _NavItem(
             label: 'Users',
             icon: LucideIcons.shield,

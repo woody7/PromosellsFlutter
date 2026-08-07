@@ -139,20 +139,24 @@ the same customer detail screen as the list view. ✅
 
 ---
 
-## Stage 4 — Reports (list + detail)
+## Stage 4 — Reports (list + detail) ✅ DONE
 
 Ports `ReportList.jsx` + `Reportcomponents/Report.js`.
 
-- [ ] Report list screen — `GET api/StockTransReports/GetAllSampleTransReports`
-- [ ] Report detail screen — `GET api/StockTransReports/DisplayDropOffReport?ReportID=`
-- [ ] PDF export (`pdf` + `printing` packages — already in AdroitERP's pubspec)
-- [ ] Excel export (`excel` package)
-- [ ] Share (native share sheet, e.g. `share_plus` — **new package, not yet
-      in pubspec.yaml**)
-- [ ] Wire Stage 1/2's post-submit navigation to this screen (currently stubbed)
+- [x] Report list screen — `GET api/StockTransReports/GetAllSampleTransReports`
+- [x] Report detail screen — `GET api/StockTransReports/DisplayDropOffReport?ReportID=`
+- [x] PDF export (`pdf` + `printing` packages)
+- [x] Excel export (`excel` package) — see decisions log: React defines this
+      but never wires it to a button; Flutter actually exposes it
+- [x] Share (`share_plus` for Excel; `printing`'s built-in `sharePdf`/`layoutPdf`
+      cover PDF share + print, so no separate share call was needed there)
+- [x] Wired Stage 1/2's post-submit navigation to this screen (was stubbed
+      via `ReportStubScreen`, now deleted — real navigation in
+      `drop_off_confirmation_sheet.dart`, `drop_off_existing_customer_dialog.dart`,
+      `pickup_sale_dialog.dart`)
 
 **Definition of done:** report list browsable, individual report viewable,
-exportable as PDF/Excel, shareable — matching `Report.js`.
+exportable as PDF/Excel, shareable — matching `Report.js`. ✅
 
 ---
 
@@ -275,3 +279,19 @@ screens that need them exist, not necessarily all at once at the end.
   is mobile-first (camera/GPS drop-off flows only make sense on a phone)
   and the remaining stages matter more than desktop polish right now.
   Decided 2026-08-07.
+- **PDF generation (Stage 4):** built as a real vector PDF via the `pdf`
+  package's widget system, not a screenshot — React's `exportToPDF`
+  screenshots the DOM with html2canvas and embeds that image in a PDF.
+  Flutter has no DOM to screenshot and the `pdf` package produces sharper,
+  smaller, text-selectable output directly, so there was no reason to
+  emulate the screenshot approach.
+- **Excel export actually wired up (Stage 4):** `Report.js` defines
+  `exportToExcel` but never renders a button for it — dead code (also
+  flagged by ESLint during the earlier build check: "'exportToExcel' is
+  assigned a value but never used"). Flutter exposes it as a real "Export
+  Excel" button since the working code already existed, just unreachable.
+- **Download vs. Share buttons (Stage 4):** on mobile there's no browser
+  download folder — both buttons go through the OS share sheet
+  (`Printing.sharePdf`), same call underneath. Kept as two buttons anyway
+  to match the React layout and because the labels still signal different
+  intent to the user, even though the mechanism is identical here.

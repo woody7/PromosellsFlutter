@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:promosells_flutter/controllers/auth_controller.dart';
 import 'package:promosells_flutter/models/customer.dart';
 import 'package:promosells_flutter/services/customer_api.dart';
+import 'package:promosells_flutter/views/reports/report_detail_screen.dart';
 import 'package:promosells_flutter/widgets/my_button.dart';
 import 'package:promosells_flutter/widgets/my_spacing.dart';
 import 'package:promosells_flutter/widgets/my_text.dart';
@@ -83,27 +84,31 @@ class _PickupSaleDialogState extends State<_PickupSaleDialog> {
     try {
       final email = Get.find<AuthController>().session.value?.email ?? '';
       final stockArray = _quantities.entries.where((e) => e.value > 0).map((e) => [e.key, e.value]).toList();
-      if (_isPickup) {
-        await CustomerApi.submitPickup(
-          customerId: widget.customerId,
-          stockArray: stockArray,
-          incidentDate: _incidentDate,
-          incidentType: _incidentType,
-          incident: _incidentController.text,
-          email: email,
-        );
-      } else {
-        await CustomerApi.submitSale(
-          customerId: widget.customerId,
-          stockArray: stockArray,
-          incidentDate: _incidentDate,
-          incidentType: _incidentType,
-          incident: _incidentController.text,
-          email: email,
-        );
-      }
+      final result = _isPickup
+          ? await CustomerApi.submitPickup(
+              customerId: widget.customerId,
+              stockArray: stockArray,
+              incidentDate: _incidentDate,
+              incidentType: _incidentType,
+              incident: _incidentController.text,
+              email: email,
+            )
+          : await CustomerApi.submitSale(
+              customerId: widget.customerId,
+              stockArray: stockArray,
+              incidentDate: _incidentDate,
+              incidentType: _incidentType,
+              incident: _incidentController.text,
+              email: email,
+            );
       widget.onSubmitted();
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+        final documentNumber = result.documentNumber;
+        if (documentNumber != null) {
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => ReportDetailScreen(reportId: documentNumber)));
+        }
+      }
     } on CustomerApiException catch (e) {
       setState(() => _error = e.message);
     } finally {

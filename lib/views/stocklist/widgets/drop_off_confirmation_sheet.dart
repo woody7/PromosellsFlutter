@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:promosells_flutter/controllers/stocklist_controller.dart';
-import 'package:promosells_flutter/views/reports/report_stub_screen.dart';
+import 'package:promosells_flutter/views/reports/report_detail_screen.dart';
 import 'package:promosells_flutter/widgets/my_button.dart';
 import 'package:promosells_flutter/widgets/my_spacing.dart';
 import 'package:promosells_flutter/widgets/my_text.dart';
@@ -69,7 +69,7 @@ class _DropOffConfirmationDialogState extends State<_DropOffConfirmationDialog> 
               Navigator.of(context).pop();
               if (documentNumber != null) {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => ReportStubScreen(documentNumber: documentNumber)),
+                  MaterialPageRoute(builder: (_) => ReportDetailScreen(reportId: documentNumber)),
                 );
               }
             },
