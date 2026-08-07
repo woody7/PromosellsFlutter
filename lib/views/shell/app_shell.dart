@@ -22,14 +22,30 @@ class _NavItem {
   const _NavItem({required this.label, required this.icon, required this.page, this.adminOnly = false});
 }
 
-/// Persistent shell (top bar + drawer nav) that hosts every top-level
-/// section once signed in. Mirrors TopNavBar.js's role gating: "Stock
-/// Reports" (Report) and "Users" only show for Admin.
+/// Width at which the shell switches from a mobile Drawer to a persistent
+/// sidebar — matches the threshold already used for the Overview
+/// dashboard's card/chart layout switch, so the whole app agrees on what
+/// counts as "wide."
+const _wideBreakpoint = 900.0;
+
+/// Content beyond this width is centered with empty margins either side
+/// rather than stretching edge-to-edge, same idea as AdroitERP's layout
+/// on very wide monitors.
+const _maxContentWidth = 1200.0;
+
+/// Persistent shell (top bar + nav) that hosts every top-level section once
+/// signed in. Mirrors TopNavBar.js's role gating: "Stock Reports" (Report)
+/// and "Users" only show for Admin.
 ///
-/// This scaffold switches sections in place via a drawer + IndexedStack
-/// rather than full GetX named routes — each placeholder becomes a real,
-/// independently routed screen (with its own controller and, where needed,
-/// URL params like customerId) as it gets built.
+/// Below [_wideBreakpoint], nav is a mobile Drawer (hamburger icon).
+/// At or above it, nav is a persistent sidebar and content gets a max-width
+/// constraint — the responsive/desktop treatment deferred from Stage 2
+/// (see ROADMAP.md's decisions log for why it didn't happen earlier).
+///
+/// This scaffold switches sections in place via nav + IndexedStack rather
+/// than full GetX named routes — each screen would become independently
+/// routed (with its own controller and, where needed, URL params like
+/// customerId) if that's ever needed; nothing here currently requires it.
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -52,63 +68,118 @@ class _AppShellState extends State<AppShell> {
         const _NavItem(label: 'Change Password', icon: LucideIcons.key_round, page: ChangePasswordScreen()),
       ];
 
+  Widget _navHeader() {
+    return DrawerHeader(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          MyText.titleLarge('Promosells'),
+          MyText.bodySmall(_auth.session.value?.email ?? '', muted: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _navList({
+    required List<_NavItem> visibleItems,
+    required int safeIndex,
+    required bool closeDrawerOnTap,
+  }) {
+    return ListView.builder(
+      itemCount: visibleItems.length,
+      itemBuilder: (context, index) {
+        final item = visibleItems[index];
+        return ListTile(
+          leading: Icon(item.icon),
+          title: MyText.bodyMedium(item.label),
+          selected: index == safeIndex,
+          onTap: () {
+            setState(() => _selectedIndex = index);
+            if (closeDrawerOnTap) Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       final visibleItems = _items.where((item) => !item.adminOnly || _auth.isAdmin).toList();
       final safeIndex = _selectedIndex < visibleItems.length ? _selectedIndex : 0;
 
-      return Scaffold(
-        appBar: AppBar(
-          title: MyText.titleMedium(visibleItems[safeIndex].label),
-          actions: [
-            IconButton(
-              icon: const Icon(LucideIcons.log_out),
-              tooltip: 'Logout',
-              onPressed: () => _auth.logout(),
-            ),
-          ],
+      final content = Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _maxContentWidth),
+          child: IndexedStack(
+            index: safeIndex,
+            children: visibleItems.map((item) => item.page).toList(),
+          ),
         ),
-        drawer: Drawer(
-          child: SafeArea(
-            child: Column(
-              children: [
-                DrawerHeader(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      MyText.titleLarge('Promosells'),
-                      MyText.bodySmall(_auth.session.value?.email ?? '', muted: true),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: visibleItems.length,
-                    itemBuilder: (context, index) {
-                      final item = visibleItems[index];
-                      return ListTile(
-                        leading: Icon(item.icon),
-                        title: MyText.bodyMedium(item.label),
-                        selected: index == safeIndex,
-                        onTap: () {
-                          setState(() => _selectedIndex = index);
-                          Navigator.of(context).pop();
-                        },
-                      );
-                    },
-                  ),
+      );
+
+      return LayoutBuilder(builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= _wideBreakpoint;
+
+        if (isWide) {
+          return Scaffold(
+            appBar: AppBar(
+              title: MyText.titleMedium(visibleItems[safeIndex].label),
+              automaticallyImplyLeading: false,
+              actions: [
+                IconButton(
+                  icon: const Icon(LucideIcons.log_out),
+                  tooltip: 'Logout',
+                  onPressed: () => _auth.logout(),
                 ),
               ],
             ),
+            body: Row(
+              children: [
+                SizedBox(
+                  width: 260,
+                  child: Material(
+                    elevation: 1,
+                    child: Column(
+                      children: [
+                        _navHeader(),
+                        Expanded(child: _navList(visibleItems: visibleItems, safeIndex: safeIndex, closeDrawerOnTap: false)),
+                      ],
+                    ),
+                  ),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(child: content),
+              ],
+            ),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: MyText.titleMedium(visibleItems[safeIndex].label),
+            actions: [
+              IconButton(
+                icon: const Icon(LucideIcons.log_out),
+                tooltip: 'Logout',
+                onPressed: () => _auth.logout(),
+              ),
+            ],
           ),
-        ),
-        body: IndexedStack(
-          index: safeIndex,
-          children: visibleItems.map((item) => item.page).toList(),
-        ),
-      );
+          drawer: Drawer(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  _navHeader(),
+                  Expanded(child: _navList(visibleItems: visibleItems, safeIndex: safeIndex, closeDrawerOnTap: true)),
+                ],
+              ),
+            ),
+          ),
+          body: content,
+        );
+      });
     });
   }
 }

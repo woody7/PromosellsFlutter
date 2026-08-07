@@ -263,24 +263,40 @@ screens that need them exist, not necessarily all at once at the end.
 
 ---
 
-## Stage 9 — Release prep
+## Stage 9 — Release prep 🟡 IN PROGRESS
 
-- [ ] Real Promosells app icon, logo, splash screen, favicon (once assets exist)
+Unlike Stages 0–8, most of this depends on things only you can provide
+(branding assets, developer accounts) rather than being pure code work —
+tackled piece by piece as you're ready for each, not all at once.
+
+- [x] Android signing config + release build — new upload keystore generated
+      (`android/keystore/upload-keystore.jks`, gitignored, **not backed up
+      anywhere else — see the warning below**), wired into
+      `android/app/build.gradle.kts`, verified with `apksigner`: the release
+      APK is genuinely signed with it, not falling back to the debug key.
+- [x] Responsive/desktop web layout — `AppShell` now switches to a
+      persistent sidebar + max-width-1200 centered content at ≥900px width;
+      below that, unchanged mobile Drawer behavior. Closes the gap flagged
+      back in Stage 2.
+- [ ] Real Promosells app icon, logo, splash screen, favicon — **blocked on
+      you having brand assets ready**
 - [ ] Replace placeholder spinner with a real branded one, if Promosells gets
       a brand animation (currently a plain themed `CircularProgressIndicator`)
-- [ ] Android signing config + release build
-- [ ] iOS signing/provisioning + release build
+      — **blocked on brand assets**
+- [ ] iOS signing/provisioning + release build — **blocked on an Apple
+      Developer account**
 - [ ] Web build hosting decision (if the web target ships for real, vs.
-      being mobile-only)
-- [ ] Responsive/desktop web layout: right now every screen is plain
-      mobile Material with no width constraints and a Drawer (mobile
-      pattern) for nav — on a wide browser window content stretches
-      awkwardly and the nav isn't discoverable. Needs a persistent sidebar
-      on wide screens + max-width content constraints, matching what
-      AdroitERP does with its `left_bar.dart` layout. Explicitly deferred
-      until all screens exist — see Decisions log.
+      being mobile-only) — **your call, not started**
 - [ ] Store listing assets (Play Store / App Store) if this replaces the
-      web app for field use
+      web app for field use — **not started**
+
+**⚠️ Keystore backup warning:** `android/keystore/upload-keystore.jks` and
+`android/key.properties` exist only on this machine, gitignored by design
+(a signing key must never be committed). If this machine is lost without a
+backup, you can never publish an update to this app under the same identity
+on Play Store again — you'd have to ship it as a brand-new listing. Copy
+both files somewhere safe (password manager, encrypted drive) before this
+matters for real.
 
 ---
 
@@ -360,3 +376,15 @@ screens that need them exist, not necessarily all at once at the end.
   offline-queue infrastructure would be a substantial feature disproportionate
   to a cross-cutting polish stage; revisit only if it comes up as an actual
   problem for field use, not preemptively.
+- **New upload keystore generated, not reusing an existing one (Stage 9):**
+  you confirmed there wasn't one already. Stored at
+  `android/keystore/upload-keystore.jks` with credentials in
+  `android/key.properties`, both gitignored. **This machine is the only copy
+  — back both files up before this matters for real** (see the warning in
+  Stage 9 above). `build.gradle.kts` falls back to debug signing only if
+  `key.properties` is absent, so a fresh checkout without the keystore still
+  builds (just not release-signed) rather than failing outright.
+- **Responsive breakpoint: 900px (Stage 9):** matches the threshold already
+  used for the Overview dashboard's card/chart layout switch (Stage 6), so
+  the whole app agrees on what counts as "wide" rather than each screen
+  picking its own number.
