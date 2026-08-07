@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:promosells_flutter/controllers/customer_list_controller.dart';
 import 'package:promosells_flutter/models/customer.dart';
 import 'package:promosells_flutter/views/customers/customer_detail_screen.dart';
+import 'package:promosells_flutter/views/customers/customer_edit_screen.dart';
 import 'package:promosells_flutter/widgets/my_card.dart';
 import 'package:promosells_flutter/widgets/my_spacing.dart';
 import 'package:promosells_flutter/widgets/my_text.dart';
@@ -66,7 +67,7 @@ class CustomerListScreen extends StatelessWidget {
             return ListView.builder(
               padding: MySpacing.only(left: 16, right: 16, bottom: 16),
               itemCount: list.length,
-              itemBuilder: (context, index) => _CustomerCard(customer: list[index]),
+              itemBuilder: (context, index) => _CustomerCard(customer: list[index], onEdited: controller.load),
             );
           }),
         ),
@@ -76,9 +77,10 @@ class CustomerListScreen extends StatelessWidget {
 }
 
 class _CustomerCard extends StatelessWidget {
-  const _CustomerCard({required this.customer});
+  const _CustomerCard({required this.customer, required this.onEdited});
 
   final Customer customer;
+  final VoidCallback onEdited;
 
   @override
   Widget build(BuildContext context) {
@@ -109,14 +111,26 @@ class _CustomerCard extends StatelessWidget {
             ),
             MyText.bodySmall('Address: ${customer.address}'),
             MySpacing.height(8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => CustomerDetailScreen(customerId: customer.customerId)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => CustomerDetailScreen(customerId: customer.customerId)),
+                  ),
+                  child: const Text('View Details'),
                 ),
-                child: const Text('View Details'),
-              ),
+                TextButton.icon(
+                  onPressed: () async {
+                    final edited = await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(builder: (_) => CustomerEditScreen(customerId: customer.customerId)),
+                    );
+                    if (edited == true) onEdited();
+                  },
+                  icon: const Icon(Icons.edit, size: 16),
+                  label: const Text('Edit'),
+                ),
+              ],
             ),
           ],
         ),

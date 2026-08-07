@@ -159,6 +159,43 @@ class CustomerApi {
     return DropOffResult(documentNumber: parseDocumentNumber(response.body));
   }
 
+  /// `POST api/ProspCustomers/UpdateCustomer`
+  static Future<void> updateCustomer({
+    required int customerId,
+    required String name,
+    required String company,
+    required String contact,
+    required String address,
+    required String email,
+    double? latitude,
+    double? longitude,
+    bool? demoAppInstalled,
+    XFile? photo,
+  }) async {
+    final request = http.MultipartRequest('POST', ApiConfig.resolve('api/ProspCustomers/UpdateCustomer'));
+
+    request.fields.addAll({
+      'customerId': customerId.toString(),
+      'name': name,
+      'company': company,
+      'contact': contact,
+      'address': address,
+      'Email': email,
+    });
+    if (latitude != null) request.fields['Latitude'] = latitude.toString();
+    if (longitude != null) request.fields['Longitude'] = longitude.toString();
+    if (demoAppInstalled != null) request.fields['DemoAppInstalled'] = demoAppInstalled.toString();
+    if (photo != null) {
+      request.files.add(await http.MultipartFile.fromPath('Photo', photo.path));
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+    if (response.statusCode != 200) {
+      throw CustomerApiException('Failed to save customer. Please try again.');
+    }
+  }
+
   /// `POST api/ProspCustomers/AddCustomerIncident` — always returns 0 on
   /// success (StatusCode(200, 0) in the controller); there's no document
   /// number for a plain incident note.

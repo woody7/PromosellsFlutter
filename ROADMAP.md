@@ -215,16 +215,27 @@ server.
 
 ---
 
-## Stage 7 — Customer Edit
+## Stage 7 — Customer Edit ✅ DONE
 
 Ports `CustomerEditPage.jsx`.
 
-- [ ] `GET api/ProspCustomers/GetCustomerDetails?customerID=`
-- [ ] `POST api/ProspCustomers/UpdateCustomer`
-- [ ] Reuses Stage 1's camera/geo capture widget for office photo/location updates
+- [x] `GET api/ProspCustomers/GetCustomerDetails?customerID=`
+- [x] `POST api/ProspCustomers/UpdateCustomer`
+- [x] Reuses Stage 1's camera/geo capture widget for office photo/location updates
+- [x] Edit entry point on Customer List (dropped in Stage 2 pending this stage,
+      added back now)
 
 **Definition of done:** existing customer's details, photo, and location can
-be edited and saved.
+be edited and saved. ✅
+
+**Bonus finding while building this stage:** `UpdateCustomer` had the same
+`_CurrentUser` singleton bug as the other endpoints fixed earlier — the
+audit-trail `ModifiedBy` field was attributed entirely from the shared
+singleton, not the actual editing user. Lower stakes than the drop-off/
+ChangePassword cases (just attribution, not data loss or account mixup),
+but same root cause and fixed the same way: `UpdateCustomerViewModel` now
+carries an optional `Email`, preferred over the singleton
+(SampleTrackerAPIs commit `9fa47fd`).
 
 ---
 
