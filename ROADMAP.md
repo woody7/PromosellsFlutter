@@ -231,6 +231,13 @@ screens that need them exist, not necessarily all at once at the end.
 - [ ] iOS signing/provisioning + release build
 - [ ] Web build hosting decision (if the web target ships for real, vs.
       being mobile-only)
+- [ ] Responsive/desktop web layout: right now every screen is plain
+      mobile Material with no width constraints and a Drawer (mobile
+      pattern) for nav — on a wide browser window content stretches
+      awkwardly and the nav isn't discoverable. Needs a persistent sidebar
+      on wide screens + max-width content constraints, matching what
+      AdroitERP does with its `left_bar.dart` layout. Explicitly deferred
+      until all screens exist — see Decisions log.
 - [ ] Store listing assets (Play Store / App Store) if this replaces the
       web app for field use
 
@@ -260,3 +267,9 @@ screens that need them exist, not necessarily all at once at the end.
   screen doesn't refresh after a transaction. `CustomerDetailController`
   refreshes stocks + incidents after every transaction modal instead — a
   UX fix with no data-integrity implications, not a behavior worth copying.
+- **Web layout deferred:** the app looks rough on a wide browser window
+  (Drawer nav not discoverable, no content width constraints) — confirmed
+  and explicitly deferred to Stage 9 rather than fixed now, since the app
+  is mobile-first (camera/GPS drop-off flows only make sense on a phone)
+  and the remaining stages matter more than desktop polish right now.
+  Decided 2026-08-07.
